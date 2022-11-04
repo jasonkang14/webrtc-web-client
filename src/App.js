@@ -134,7 +134,6 @@ function App() {
       const [remoteStream] = event.streams;
       remoteVideoRef.current.srcObject = remoteStream;
     })
-
   }, [])
 
   return (
