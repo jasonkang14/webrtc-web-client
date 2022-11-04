@@ -28,6 +28,7 @@ const configuration = {
 
 function App() {
   const localVideoRef = useRef(null);
+  const remoteVideoRef = useRef(null);
   const roomIdRef = useRef('randomString');
   const pcRef = useRef(new RTCPeerConnection(configuration));
   const socketRef = useRef(null);
@@ -102,6 +103,12 @@ function App() {
   }, [])
 
   useEffect(() => {
+    remoteVideoRef.current.onloadedmetadata = () => {
+      remoteVideoRef.current.play();
+    }
+  }, [])
+
+  useEffect(() => {
     pcRef.current.addEventListener("signalingstatechange", () => {
       console.log("signalingState:", pcRef.current.signalingState);
       if (pcRef.current.signalingState === 'stable' && pcRef.current.iceGatheringState === 'complete') {
@@ -122,12 +129,20 @@ function App() {
       iceCandidateRef.current = [...iceCandidateRef.current, event.candidate]
     })
 
+    pcRef.current.addEventListener("track", (event) => {
+      console.log("event: ", event);
+      const [remoteStream] = event.streams;
+      remoteVideoRef.current.srcObject = remoteStream;
+    })
 
   }, [])
 
   return (
     <div className="App">
-      <LocalVideo ref={localVideoRef} muted />
+      <Container>
+        <LocalVideo ref={localVideoRef} muted />
+        <RemoteVideo ref={remoteVideoRef} />
+      </Container>
       <button onClick={handleJoinBtnClick}>영상 연결 참여</button>
     </div>
   );
@@ -135,4 +150,16 @@ function App() {
 
 export default App;
 
-const LocalVideo = styled.video``;
+const Container = styled.div`
+  display: flex;
+`
+
+const LocalVideo = styled.video`
+  width: 500px;
+  height: 500px;
+`;
+
+const RemoteVideo = styled(LocalVideo)`
+  width: 300px;
+  height: 300px;
+`
