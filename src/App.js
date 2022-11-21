@@ -42,7 +42,6 @@ function App() {
     socketRef.current = socket;
     socket.emit('join', {roomId: roomIdRef.current})
     socket.on('remote-offer', ({offer}) => {
-      console.log("remote offer received: ", offer);
       if (offer) {
         handleRemoteOffer(offer);
         return
@@ -58,7 +57,6 @@ function App() {
     socket.on('remote-ice', ({iceCandidates}) => {
       iceCandidates.forEach((iceCandidate) => {
         pcRef.current.addIceCandidate(iceCandidate)
-        console.log("pcRef.current: ", pcRef.current);
       })
     })
   }
@@ -102,7 +100,6 @@ function App() {
     })
 
     pcRef.current.addEventListener("track", (event) => {
-      console.log("event: ", event);
       const [remoteStream] = event.streams;
       remoteVideoRef.current.srcObject = remoteStream;
     })
